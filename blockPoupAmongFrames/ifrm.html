@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+
+        <h2>這是 Iframe, 查詢結果顯示區</h2>
+
+        <input type="button" id="btnInsert" value="新增資料"
+               style="font-family:'微軟正黑體'; font-size:1.2em" />
+
+        <table border="1"
+               style="width:100%; font-family:'微軟正黑體';font-size:1.2em;">
+            <thead>
+                <tr style="background-color:#362007;color:white">
+                    <th style="width:120px">操作項目</th>
+                    <th style="width:300px">電子郵件</th>
+                    <th style="width:200px">密碼</th>
+                    <th>記住登入</th>
+                </tr>
+            </thead>
+            <tbody style="background-color:#cdcbcb">
+                <tr>
+                    <td>
+                        <input type="button" class="btnUpdate" value="編輯" />
+                        <input type="button" class="btnDelete" value="刪除" />
+                    </td>
+                    <td>sawang@ms3.hinet.net</td>
+                    <td>12345678</td>
+                    <td>是</td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="button" class="btnUpdate" value="編輯" />
+                        <input type="button" class="btnDelete" value="刪除" />
+                    </td>
+                    <td>vastwish.go@gmail.com</td>
+                    <td>87654321</td>
+                    <td>否</td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+    <div id="divDialog"
+         style="display:none; font-family:'微軟正黑體'; font-size:1.2em;">
+        <!--run at parent-->
+
+        <form role="form" name="frmForm1" method="post"
+              action="處理頁..." target="ifrm2">
+            <div class="form-group">
+                <label for="email">E-mail:</label>
+                <input type="text" class="form-control"
+                       id="email" name="email">
+            </div>
+            <div class="form-group">
+                <label for="pwd">Password:</label>
+                <input type="password" class="form-control"
+                       id="pwd" name="pwd">
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="ck" name="ck">Remember me
+                </label>
+            </div>
+            <input type="submit" value="傳送" class="btn btn-primary"
+                   onclick="return send();" />
+            <input type="reset" value="重填" class="btn btn-info"
+                   onclick="return fillInit();" />
+            <input type="button" value="關閉" class="btn btn-danger"
+                   onclick="$.unblockUI();" />
+            <input type="hidden" name="params" />
+        </form>
+
+        <script type="text/javascript">
+            function send() {
+                frmForm1.params.value = frmForm1.email.value + "|"
+                    + frmForm1.pwd.value + "|"
+                    + frmForm1.ck.checked.toString();
+                alert('hidden 欄位 parame = ' + frmForm1.params.value
+                    + '\n即將傳到' + frmForm1.action
+                    + '\n指定目標框架 ' + frmForm1.target);
+                $.unblockUI();
+                return false;
+            }
+            function fillInit() {
+                pms = frmForm1.params.value;
+                frmForm1.email.value = pms.split("|")[0];
+                frmForm1.pwd.value = pms.split("|")[1];
+                frmForm1.ck.checked =
+                    pms.split("|")[2] == 'true' ? true : false;
+                return false;
+            }
+        </script>
+
+    </div>
+
+    <script src="Scripts/jquery-1.9.1.js"></script>
+
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#btnInsert').click(function () {
+                frmForm1.params.value = "||";
+                openBlockUI(400, 300, $('#divDialog').html())
+            });
+
+            $('.btnUpdate').click(function () {
+                var $td = $(this).closest('tr').find('td');
+                var pms = $td.eq(1).html();
+                pms += "|" + $td.eq(2).html();
+                pms += "|" + ($td.eq(3).html() == '是' ? 'true' : 'false');
+                frmForm1.params.value = pms;
+                openBlockUI(400, 300, $('#divDialog').html());
+                //
+                parent.frmForm1.email.value = pms.split("|")[0];
+                parent.frmForm1.pwd.value = pms.split("|")[1];
+                parent.frmForm1.ck.checked =
+                    pms.split("|")[2] == 'true' ? true : false;
+            });
+
+            $('.btnDelete').click(function () {
+                var keyValue = $(this).closest('td').next().html();
+                if(!confirm('確定要刪除 ' + keyValue + '？'))
+                {
+                    return false;
+                }
+                return false;
+            });
+        });
+
+        function openBlockUI(ww, hh, content) {
+            ww = ww.toString() + 'px';
+            hh = hh.toString() + 'px';
+            tt = '100px';
+            parent.$.blockUI(
+                {
+                    message: content,
+                    css: {
+                        border: 'none',
+                        padding: '10px',
+                        width: ww,
+                        height: hh,
+                        top: tt,
+                        //backgroundColor: '#000',
+                        '-webkit-border-radius': '10px',
+                        '-moz-border-radius': '10px',
+                        //opacity: .5,
+                        fadeIn: 0
+                        //color: '#FFFFFF'
+                    }
+                }
+                );
+        }
+
+
+    </script>
+</body>
+</html>
